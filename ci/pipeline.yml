@@ -6,7 +6,7 @@ jobs:
   plan:
   - get: git-concourse-build-docker-image
     trigger: true
-  - put: docker-image
+  - put: build-docker-image
     params:
       build: git-concourse-build-docker-image/ci
 
@@ -14,5 +14,12 @@ resources:
 - name: git-concourse-build-docker-image
   type: git
   source:
-    uri: git repo uri
+    uri: https://github.com/wrast/concourse-build-docker-image.git
     branch: master
+- name: build-docker-image
+  type: docker-image
+  source:
+    email: {{docker-hub-email}}
+    username: {{docker-hub-username}}
+    password: {{docker-hub-password}}
+    repository: {{docker-hub-image-iaas}}

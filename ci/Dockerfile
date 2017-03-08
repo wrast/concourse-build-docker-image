@@ -1,18 +1,17 @@
-FROM concourse/concourse-ci  
-#https://github.com/concourse/concourse/blob/master/ci/dockerfiles/concourse-ci/Dockerfile
+# Start from a Debian image with the latest version of Go installed
+# and a workspace (GOPATH) configured at /go.
+FROM golang
 
-RUN apt-get update && apt-get install curl wget bzr -y
+# Copy the local package files to the container's workspace.
+ADD . /go/src/github.com/ECSTeam/IaaSSmokeTest/src/readiness
 
-ADD http://stedolan.github.io/jq/download/linux64/jq /usr/bin/  
-RUN chmod 775 /usr/bin/jq
+# Build the outyet command inside the container.
+# (You may fetch or manage dependencies here,
+# either manually or with a tool like "godep".)
+RUN go install github.com/ECSTeam/IaaSSmokeTest/src/readiness
 
-# Install Go
-# mkdir -p /goroot will create goroot dir under the root in the docker
-# curl url will output to stand out, with | to direct it to tar, which will extract the pre-compiled 
-# golang to /goroot
+# Run the outyet command by default when the container starts.
+ENTRYPOINT /go/bin/checkreadiness
 
-RUN \  
-  mkdir -p /goroot /gopath && \
-  curl https://storage.googleapis.com/golang/go1.4.2.linux-amd64.tar.gz | \
-  tar xvzf - -C /goroot --strip-components=1
-
+# Document that the service listens on port 8080.
+#EXPOSE 8080
